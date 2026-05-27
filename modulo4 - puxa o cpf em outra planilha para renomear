@@ -1,3 +1,4 @@
+## Esse módulo muda pastas nomeadas com o nome completo do colaborador para CPF_matrícula"
 Public Sub mudarNomeparaCPfMatricula()
 
     Dim wsRen As Worksheet
