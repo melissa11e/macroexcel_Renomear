@@ -1,0 +1,26 @@
+Public Sub TrocarUnderlineEHifenPorEspaco()
+
+    Dim ws As Worksheet
+    Dim ultimaLinha As Long
+    Dim i As Long
+    Dim txt As String
+
+    Set ws = ThisWorkbook.Worksheets("Renomear")
+
+    ' última linha pela coluna C
+    ultimaLinha = ws.Cells(ws.Rows.Count, 3).End(xlUp).Row
+
+    For i = 8 To ultimaLinha
+
+        txt = ws.Cells(i, 3).Value
+
+        If txt <> "" Then
+            txt = Replace(txt, "_", " ")
+            txt = Replace(txt, "-", " ")
+            txt = Replace(txt, ".", "")   ' <<< remove os pontos
+            ws.Cells(i, 3).Value = txt
+        End If
+
+    Next i
+
+End Sub
