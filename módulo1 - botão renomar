@@ -1,0 +1,82 @@
+##esse módulo é para o botão de renomear e para o botão de remover espaços.##
+
+Public PASTA_BASE_GLOBAL As String
+
+
+Public Function LimparTexto(ByVal txt As String) As String
+    txt = Replace(txt, Chr(160), " ") ' remove espaço não quebrável
+    txt = Trim(txt)
+    LimparTexto = txt
+End Function
+
+
+' ===== MACRO PRINCIPAL =====
+Public Sub RenomearPastas()
+
+    Dim ws As Worksheet
+    Dim ultimaLinha As Long
+    Dim i As Long
+    Dim fso As Object
+    Dim origem As String, destino As String
+    Dim temp As String
+
+    Set ws = ThisWorkbook.Worksheets("Renomear")
+    Set fso = CreateObject("Scripting.FileSystemObject")
+
+    ' ?? garante que o botão de escolher pasta foi usado
+    If PASTA_BASE_GLOBAL = "" Then
+        MsgBox "Selecione a pasta primeiro!", vbExclamation
+        Exit Sub
+    End If
+
+    ' garante barra final
+    If Right(PASTA_BASE_GLOBAL, 1) <> "\" Then
+        PASTA_BASE_GLOBAL = PASTA_BASE_GLOBAL & "\"
+    End If
+
+    ' última linha baseada na coluna B
+    ultimaLinha = ws.Cells(ws.Rows.Count, 2).End(xlUp).Row
+
+    For i = 8 To ultimaLinha
+
+        origem = PASTA_BASE_GLOBAL & LimparTexto(ws.Cells(i, 2).Value)
+        destino = PASTA_BASE_GLOBAL & LimparTexto(ws.Cells(i, 3).Value)
+
+        If ws.Cells(i, 2).Value = "" Or ws.Cells(i, 3).Value = "" Then
+            ws.Cells(i, 4).Value = "Linha vazia"
+
+        ' mesmo nome (inclusive só muda maiúscula/minúscula)
+        ElseIf LCase(origem) = LCase(destino) Then
+
+            If fso.FolderExists(origem) Then
+                temp = origem & "_tmp_" & Format(Now, "hhmmss")
+
+                fso.MoveFolder origem, temp
+                DoEvents
+                fso.MoveFolder temp, destino
+
+                ws.Cells(i, 4).Value = "Renomeado (caixa)"
+            Else
+                ws.Cells(i, 4).Value = "Origem não encontrada"
+            End If
+
+        ElseIf fso.FolderExists(origem) Then
+
+            If Not fso.FolderExists(destino) Then
+                fso.MoveFolder origem, destino
+                DoEvents
+                ws.Cells(i, 4).Value = "Renomeado"
+            Else
+                ws.Cells(i, 4).Value = "Destino já existe"
+            End If
+
+        Else
+            ws.Cells(i, 4).Value = "Origem não encontrada"
+        End If
+
+    Next i
+
+    MsgBox "Processo Concluído!", vbInformation
+
+End Sub
+
