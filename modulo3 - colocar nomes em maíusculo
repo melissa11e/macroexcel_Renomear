@@ -1,0 +1,25 @@
+Public Sub ColocarNomesEmMaiusculo()
+
+    Dim ws As Worksheet
+    Dim i As Long
+    Dim ultimaLinha As Long
+    Dim texto As String
+
+    Set ws = ThisWorkbook.Worksheets("Renomear")
+
+    ultimaLinha = ws.Cells(ws.Rows.Count, 3).End(xlUp).Row
+
+    For i = 8 To ultimaLinha
+
+        texto = Trim(ws.Cells(i, 3).Value)
+
+        If texto <> "" Then
+            ws.Cells(i, 3).Value = UCase(texto)
+        End If
+
+    Next i
+
+    MsgBox "Nomes convertidos para MAIÚSCULO!", vbInformation
+
+End Sub
+
