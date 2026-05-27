@@ -1,4 +1,4 @@
-Public Sub PuxarCPF_para_Renomear()
+Public Sub mudarNomeparaCPfMatricula()
 
     Dim wsRen As Worksheet
     Dim wsAtivos As Worksheet
