@@ -1,0 +1,33 @@
+Public Sub RemoverNumeros()
+
+    Dim ws As Worksheet
+    Dim ultimaLinha As Long
+    Dim i As Long
+    Dim txt As String
+    Dim j As Integer
+
+    Set ws = ThisWorkbook.Worksheets("Renomear")
+
+    ' última linha pela coluna C
+    ultimaLinha = ws.Cells(ws.Rows.Count, 3).End(xlUp).Row
+
+    For i = 8 To ultimaLinha
+
+        txt = ws.Cells(i, 3).Value
+
+        If txt <> "" Then
+            For j = 0 To 9
+                txt = Replace(txt, CStr(j), "")
+            Next j
+
+            ' remove espaços extras
+            txt = Application.WorksheetFunction.Trim(txt)
+
+            ws.Cells(i, 3).Value = txt
+        End If
+
+    Next i
+
+
+End Sub
+
