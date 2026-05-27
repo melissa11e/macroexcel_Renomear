@@ -1,4 +1,4 @@
-## esse código pega pastas que estão nomeadas apenas com CPF e transforma seu nome para CPF_matricula ##
+## Esse Módulo pega pastas que estão nomeadas apenas com CPF e transforma seu nome para CPF_matrícula ##
 Public Sub PuxarCPFparaCPF_Matricula()
 
     Dim wsRen As Worksheet
