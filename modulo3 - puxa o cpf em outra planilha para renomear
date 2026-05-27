@@ -1,0 +1,84 @@
+Public Sub PuxarCPF_para_Renomear()
+
+    Dim wsRen As Worksheet
+    Dim wsAtivos As Worksheet
+    Dim wsDemitidos As Worksheet
+    
+    Dim dictCPF As Object
+    Dim dictContagem As Object
+
+    Dim ultimaRen As Long
+    Dim ultimaAtivos As Long
+    Dim ultimaDemitidos As Long
+    Dim i As Long
+
+    Dim nome As String
+    Dim cpfMatricula As String
+
+    Set wsRen = ThisWorkbook.Worksheets("Renomear")
+    Set wsAtivos = ThisWorkbook.Worksheets("Ativos")
+    Set wsDemitidos = ThisWorkbook.Worksheets("Demitidos")
+
+    Set dictCPF = CreateObject("Scripting.Dictionary")
+    Set dictContagem = CreateObject("Scripting.Dictionary")
+
+    ' ===== 1) CONTA NOMES NA RENOMEAR =====
+    ultimaRen = wsRen.Cells(wsRen.Rows.Count, 2).End(xlUp).Row
+
+    For i = 8 To ultimaRen
+        nome = LimparTexto(wsRen.Cells(i, 2).Value) ' Coluna B
+        If nome <> "" Then
+            If dictContagem.Exists(nome) Then
+                dictContagem(nome) = dictContagem(nome) + 1
+            Else
+                dictContagem.Add nome, 1
+            End If
+        End If
+    Next i
+
+    ' ===== 2) DICIONÁRIO NOME -> CPF (ATIVOS) =====
+    ultimaAtivos = wsAtivos.Cells(wsAtivos.Rows.Count, 2).End(xlUp).Row ' Coluna B
+
+    For i = 2 To ultimaAtivos
+        nome = LimparTexto(wsAtivos.Cells(i, 2).Value)        ' Coluna B = Nome
+        cpfMatricula = wsAtivos.Cells(i, 6).Value            ' Coluna F = CPF_Matricula
+
+        If nome <> "" And cpfMatricula <> "" Then
+            If Not dictCPF.Exists(nome) Then
+                dictCPF.Add nome, cpfMatricula
+            End If
+        End If
+    Next i
+
+    ' ===== 3) DICIONÁRIO NOME -> CPF (DEMITIDOS) =====
+    ultimaDemitidos = wsDemitidos.Cells(wsDemitidos.Rows.Count, 2).End(xlUp).Row ' Coluna B
+
+    For i = 2 To ultimaDemitidos
+        nome = LimparTexto(wsDemitidos.Cells(i, 2).Value)     ' Coluna B = Nome
+        cpfMatricula = wsDemitidos.Cells(i, 7).Value         ' Coluna G = CPF_Matricula
+
+        If nome <> "" And cpfMatricula <> "" Then
+            If Not dictCPF.Exists(nome) Then
+                dictCPF.Add nome, cpfMatricula
+            End If
+        End If
+    Next i
+
+    ' ===== 4) PREENCHE CPF APENAS SE NOME NÃO FOR DUPLICADO =====
+    For i = 8 To ultimaRen
+
+        nome = LimparTexto(wsRen.Cells(i, 2).Value)
+
+        If nome <> "" Then
+            If dictContagem(nome) = 1 Then
+                If dictCPF.Exists(nome) Then
+                    wsRen.Cells(i, 3).Value = dictCPF(nome)
+                End If
+            End If
+        End If
+
+    Next i
+
+
+End Sub
+
