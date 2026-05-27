@@ -1,0 +1,120 @@
+## esse código pega pastas que estão nomeadas apenas com CPF e transforma seu nome para CPF_matricula ##
+Public Sub PuxarCPFparaCPF_Matricula()
+
+    Dim wsRen As Worksheet
+    Dim wsAtivos As Worksheet
+    Dim wsDemitidos As Worksheet
+    
+    Dim dictCPF As Object
+    Dim dictContagem As Object
+
+    Dim ultimaRen As Long
+    Dim ultimaAtivos As Long
+    Dim ultimaDemitidos As Long
+    Dim i As Long
+
+    Dim cpf As String
+    Dim cpfMatricula As String
+
+    Set wsRen = ThisWorkbook.Worksheets("Renomear")
+    Set wsAtivos = ThisWorkbook.Worksheets("Ativos")
+    Set wsDemitidos = ThisWorkbook.Worksheets("Demitidos")
+
+    Set dictCPF = CreateObject("Scripting.Dictionary")
+    Set dictContagem = CreateObject("Scripting.Dictionary")
+
+    ' ===== 1) CONTA CPF NA RENOMEAR =====
+    ultimaRen = wsRen.Cells(wsRen.Rows.Count, 2).End(xlUp).Row
+
+    For i = 8 To ultimaRen
+
+        cpf = ExtrairNumeros(wsRen.Cells(i, 2).Value)
+
+        If cpf <> "" Then
+            If dictContagem.Exists(cpf) Then
+                dictContagem(cpf) = dictContagem(cpf) + 1
+            Else
+                dictContagem.Add cpf, 1
+            End If
+        End If
+
+    Next i
+
+
+    ' ===== 2) DICIONÁRIO CPF -> CPF_MATRICULA (ATIVOS) =====
+    ultimaAtivos = wsAtivos.Cells(wsAtivos.Rows.Count, 4).End(xlUp).Row
+
+    For i = 2 To ultimaAtivos
+
+        cpf = ExtrairNumeros(wsAtivos.Cells(i, 4).Value)
+        cpfMatricula = wsAtivos.Cells(i, 6).Value
+
+        If cpf <> "" And cpfMatricula <> "" Then
+            If Not dictCPF.Exists(cpf) Then
+                dictCPF.Add cpf, cpfMatricula
+            End If
+        End If
+
+    Next i
+
+
+    ' ===== 3) DICIONÁRIO CPF -> CPF_MATRICULA (DEMITIDOS) =====
+    ultimaDemitidos = wsDemitidos.Cells(wsDemitidos.Rows.Count, 4).End(xlUp).Row
+
+    For i = 2 To ultimaDemitidos
+
+        cpf = ExtrairNumeros(wsDemitidos.Cells(i, 4).Value)
+        cpfMatricula = wsDemitidos.Cells(i, 7).Value
+
+        If cpf <> "" And cpfMatricula <> "" Then
+            If Not dictCPF.Exists(cpf) Then
+                dictCPF.Add cpf, cpfMatricula
+            End If
+        End If
+
+    Next i
+
+
+    ' ===== 4) PREENCHE CPF_MATRICULA =====
+    For i = 8 To ultimaRen
+
+        cpf = ExtrairNumeros(wsRen.Cells(i, 2).Value)
+
+        If cpf <> "" Then
+            If dictContagem(cpf) = 1 Then
+                If dictCPF.Exists(cpf) Then
+                    wsRen.Cells(i, 3).Value = dictCPF(cpf)
+                End If
+            End If
+        End If
+
+    Next i
+
+    MsgBox "Processo concluído!", vbInformation
+
+End Sub
+
+
+
+' ===== FUNÇÃO QUE EXTRAI APENAS NÚMEROS =====
+Function ExtrairNumeros(texto As String) As String
+
+    Dim i As Long
+    Dim resultado As String
+    Dim c As String
+
+    texto = CStr(texto)
+
+    For i = 1 To Len(texto)
+
+        c = Mid(texto, i, 1)
+
+        If c Like "[0-9]" Then
+            resultado = resultado & c
+        End If
+
+    Next i
+
+    ExtrairNumeros = resultado
+
+End Function
