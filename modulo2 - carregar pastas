@@ -1,0 +1,36 @@
+Public Sub CarregarPastas()
+
+    Dim ws As Worksheet
+    Dim fso As Object
+    Dim pasta As Object
+    Dim subpasta As Object
+    Dim linha As Long
+
+    Set ws = ActiveWorkbook.Worksheets("Renomear")
+    Set fso = CreateObject("Scripting.FileSystemObject")
+
+    With Application.FileDialog(msoFileDialogFolderPicker)
+        .Title = "Selecione a pasta (ex: 01 2022)"
+        If .Show <> -1 Then Exit Sub
+
+        ' ?? salva a pasta escolhida na variável global
+        PASTA_BASE_GLOBAL = .SelectedItems(1)
+    End With
+
+    ws.Range("B8:D" & ws.Rows.Count).ClearContents
+    linha = 8
+
+    Set pasta = fso.GetFolder(PASTA_BASE_GLOBAL)
+
+    ' SOMENTE as pastas diretamente dentro da escolhida
+    For Each subpasta In pasta.SubFolders
+        ws.Cells(linha, 2).Value = subpasta.Name
+        ws.Cells(linha, 3).Value = subpasta.Name
+        ws.Cells(linha, 4).Value = ""
+        linha = linha + 1
+    Next subpasta
+
+    MsgBox "Pastas carregadas (apenas 1º nível)!", vbInformation
+
+End Sub
+
